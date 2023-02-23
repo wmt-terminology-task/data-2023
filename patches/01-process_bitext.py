@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+raise Exception("Deprecated script in favor of 07-process_bitext_new.py")
+
 import xml.etree.ElementTree as ET
 import json
 import argparse
