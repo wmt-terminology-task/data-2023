@@ -5,11 +5,11 @@ mkdir -p data/align_small
 BINFASTALIGN="/home/vilda/bin/fast_align/build/fast_align"
 BINATOOLS="/home/vilda/bin/fast_align/build/atools"
 
-cat data/tok/report.de-en.de data/tok/CCAligned.de-en.de > data/align/de-en.de
-cat data/tok/report.de-en.en data/tok/CCAligned.de-en.en > data/align/de-en.en
+cat data/tok/report.exp.de-en.de data/tok/CCAligned.de-en.de > data/align/de-en.de
+cat data/tok/report.exp.de-en.en data/tok/CCAligned.de-en.en > data/align/de-en.en
 
-cat data/tok/elitr.cs-en.cs data/tok/CCAligned.cs-en.cs > data/align/cs-en.cs
-cat data/tok/elitr.cs-en.en data/tok/CCAligned.cs-en.en > data/align/cs-en.en
+cat data/tok/elitr.exp.cs-en.cs data/tok/CCAligned.cs-en.cs > data/align/cs-en.cs
+cat data/tok/elitr.exp.cs-en.en data/tok/CCAligned.cs-en.en > data/align/cs-en.en
 
 SPECIALDELIM=$'\001'
 paste -d $SPECIALDELIM data/align/de-en.de data/align/de-en.en | sed "s/$SPECIALDELIM/ ||| /" > data/align/de-en.both
@@ -18,7 +18,7 @@ paste -d $SPECIALDELIM data/align/cs-en.cs data/align/cs-en.en | sed "s/$SPECIAL
 # no need to replace existing " ||| " with " || " (checked it's not in the data)
 
 # cap to 10M
-head -n 10000000 data/align/de-en.both > data/align/de-en.small
+head -n 10000000 data/align/de-en.both | grep -ve "^ ||| $" > data/align/de-en.small
 head -n 10000000 data/align/cs-en.both | grep -ve "^ ||| $" > data/align/cs-en.small
 
 $BINFASTALIGN -i data/align/de-en.small -d -o -v > data/align/de-en.forward.align

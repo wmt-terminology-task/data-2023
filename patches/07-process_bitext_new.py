@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 
-import xml.etree.ElementTree as ET
+import nltk.tokenize
 import json
 import argparse
 import random
 random.seed(0)
+
+sent_tokenize = nltk.tokenize.sent_tokenize
 
 args = argparse.ArgumentParser()
 args.add_argument("-l", "--language", default="cs")
@@ -42,6 +44,9 @@ for (sent_cs, sent_en), align in zip(data_both, data_align):
         continue
     seen_sents.add(sent_cs)
     seen_sents.add(sent_en)
+    
+    sents_en = sent_tokenize(sent_en)
+    sents_cs = sent_tokenize(sent_cs)
 
     sent_cs = sent_cs.split(" ")
     sent_en = sent_en.split(" ")
@@ -76,6 +81,7 @@ for (sent_cs, sent_en), align in zip(data_both, data_align):
             if len(translation_target) > 1 and len(translation_target)/len(translation_source) > 0.5 and len(translation_target)/len(translation_source) < 2:
                 translation_dict_1.append({"en": translation_source, args.language: translation_target})
 
+    # add to output
     if len(translation_dict_1) > 0:
         fdict1.write(json.dumps(translation_dict_1, ensure_ascii=False) + "\n")
     else:
@@ -98,6 +104,7 @@ for (sent_cs, sent_en), align in zip(data_both, data_align):
         if len(translation_target) > 1 and len(translation_target)/len(translation_source) > 0.5 and len(translation_target)/len(translation_source) < 2:
             translation_dict_2.append({"en": translation_source, args.language: translation_target})
 
+    # add to output
     if len(translation_dict_2) > 0:
         fdict2.write(json.dumps(translation_dict_2, ensure_ascii=False) + "\n")
     else:
