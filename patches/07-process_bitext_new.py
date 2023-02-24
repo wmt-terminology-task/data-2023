@@ -24,14 +24,42 @@ def sent_filter(sent1, sent2):
         return False
     return True
 
+def align_markable(markable, sent_cs, sent_en):
+    num_words = markable.count(" ") + 1
+    translation_target = [] 
+    alignment_targets_seen= set()
+
+    for word_i in range(len(sent_en)):
+        sent_trunk = " ".join(sent_en[word_i:])
+        if sent_trunk.lower().startswith(markable.lower()):
+            break
+    assert sent_trunk.lower().startswith(markable.lower())
+
+    alignment_targets_i_all = []
+    for align_word_i in range(word_i, word_i+num_words):
+        alignment_targets_i = [x[0] for x in align if x[1] == align_word_i and x[0] not in alignment_targets_seen]
+        # remove prefix (Grand Prix - Velkou Velkou Cenu)
+        alignment_targets_seen.update(alignment_targets_i)
+        alignment_targets_i_all += alignment_targets_i
+    
+    # make sure that the mapped is a continuous segment from the CS side
+    alignment_targets_i_all.sort()
+    translation_target += [sent_cs[x] for x in alignment_targets_i_all]
+        
+    translation_target = " ".join(translation_target)
+    translation_source = sent_trunk[:len(markable)]
+    return translation_target, translation_source
+
 data_both = [x.rstrip("\n").split(" ||| ") for x in open(f"data/align_small/{args.language}-en.both", "r").readlines()]
 data_align = [x.rstrip("\n") for x in open(f"data/align_small/{args.language}-en.algn", "r").readlines()]
 
 markables = set(open(f"data/markables/{args.language}-en.en", "r").read().rstrip().split("\n"))
+# make sure we process longer markables first to avoid prefix issue
+markables = sorted(list(markables), key=len, reverse=True)
 markables = {x.lower() for x in markables}
 
 fen = open(f"data/clean/{args.language}-en.en", "w")
-fde = open(f"data/clean/{args.language}-en.de", "w")
+fde = open(f"data/clean/{args.language}-en.{args.language}", "w")
 fdict1 = open(f"data/clean/{args.language}-en.dict1.jsonl", "w")
 fdict2 = open(f"data/clean/{args.language}-en.dict2.jsonl", "w")
 
@@ -61,6 +89,7 @@ for (sent_cs, sent_en), align in zip(data_both, data_align):
 
     # hacks for multi-word markables
     translation_dict_1 = []
+    true_markables_length = []
     for word_i, word in enumerate(sent_en):
         sent_trunk = " ".join(sent_en[word_i:])
         sent_trunk_lower = " ".join(sent_en[word_i:]).lower()
@@ -70,16 +99,10 @@ for (sent_cs, sent_en), align in zip(data_both, data_align):
                 if sent_trunk_lower.startswith(markable):
                     break
 
-            num_words = markable.count(" ") + 1
-            translation_target = [] 
-            for align_word_i in range(word_i, word_i+num_words):
-                alignment_targets_i = [x[0] for x in align if x[1] == align_word_i]
-                translation_target += [sent_cs[x] for x in alignment_targets_i]
-                
-            translation_target = " ".join(translation_target)
-            translation_source = sent_trunk[:len(markable)]
-            if len(translation_target) > 1 and len(translation_target)/len(translation_source) > 0.5 and len(translation_target)/len(translation_source) < 2:
+            translation_target, translation_source = align_markable(markable, sent_cs, sent_en)
+            if len(translation_target) > 1 and len(translation_target)/len(translation_source) > 0.5 and len(translation_source)/len(translation_target) > 0.5:
                 translation_dict_1.append({"en": translation_source, args.language: translation_target})
+                true_markables_length.append(markable.count(" ") + 1)
 
     # add to output
     if len(translation_dict_1) > 0:
@@ -89,20 +112,19 @@ for (sent_cs, sent_en), align in zip(data_both, data_align):
         
     # randomized dictionary
     translation_dict_2 = []
-    words_i = random.sample(list(range(len(sent_en))), k=min(2, len(sent_en)))
-    for word_i in words_i:
-        markable = sent_en[word_i]
-        sent_trunk = " ".join(sent_en[word_i:])
-        num_words = 1
-        translation_target = [] 
-        for align_word_i in range(word_i, word_i+num_words):
-            alignment_targets_i = [x[0] for x in align if x[1] == align_word_i]
-            translation_target += [sent_cs[x] for x in alignment_targets_i]
-            
-        translation_target = " ".join(translation_target)
-        translation_source = sent_trunk[:len(markable)]
-        if len(translation_target) > 1 and len(translation_target)/len(translation_source) > 0.5 and len(translation_target)/len(translation_source) < 2:
-            translation_dict_2.append({"en": translation_source, args.language: translation_target})
+    markables_random_seen = set()
+    for markable_len in true_markables_length:
+        while True:
+            markable_i = random.choice(range(len(sent_en)-markable_len+1))
+            markable = " ".join(sent_en[markable_i:markable_i+markable_len])
+            if markable in markables_random_seen:
+                continue
+            markables_random_seen.add(markable)
+            translation_target, translation_source = align_markable(markable, sent_cs, sent_en)
+            print(markable, translation_target, translation_source, sent_en, sep=" ||| ")
+            if len(translation_target) > 1 and len(translation_target)/len(translation_source) > 0.5 and len(translation_source)/len(translation_target) > 0.5:
+                translation_dict_2.append({"en": translation_source, args.language: translation_target})
+                break
 
     # add to output
     if len(translation_dict_2) > 0:
