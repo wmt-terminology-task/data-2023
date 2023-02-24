@@ -114,9 +114,17 @@ for (sent_cs, sent_en), align in zip(data_both, data_align):
     translation_dict_2 = []
     markables_random_seen = set()
     for markable_len in true_markables_length:
+        attempts = 20
         while True:
             markable_i = random.choice(range(len(sent_en)-markable_len+1))
             markable = " ".join(sent_en[markable_i:markable_i+markable_len])
+            attempts -= 1
+            if attempts == 0:
+                break
+            # disallow true markables
+            if markable.lower() in markables:
+                continue
+            # disallow already added random markables
             if markable in markables_random_seen:
                 continue
             markables_random_seen.add(markable)
