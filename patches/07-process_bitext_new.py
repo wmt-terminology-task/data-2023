@@ -85,6 +85,8 @@ def mutate_markables_1(translation_source, translation_target, data_fix):
 
     possible_match = [x for x in data_fix if translation_source + " + " + translation_target == x[0]]
     assert len(possible_match) <= 1
+    if translation_source == "cas":
+        print(possible_match)
     if possible_match:
         possible_match = possible_match[0]
         if possible_match[1] == "DEL":
@@ -103,7 +105,7 @@ data_fix1 = [tuple([x[0]]+ x[1].split("| ")) for x in data_fix1]
 data_fix2 = [x[1:].rstrip("\n").split(" | ") for x in open(f"data/markables/{args.language}-en.fix2", "r").readlines()]
 data_fix2 = [(int(x[0]), *tuple(x[1].split(" + "))) for x in data_fix2]
 markables = set(open(f"data/markables/{args.language}-en.en", "r").read().rstrip().split("\n"))
-# make sure we process longer markables first to avoid prefix issue
+# make sure we process longer markables first to avoid substring issue
 markables = sorted(list(markables), key=len, reverse=True)
 markables = {x.lower() for x in markables if x}
 
@@ -150,7 +152,12 @@ for (sent_cs, sent_en), align in zip(data_both, data_align):
                 if sent_trunk_lower.startswith(markable):
                     break
 
+
             translation_target, translation_source = align_markable(markable, sent_cs, sent_en)
+            translation_source, translation_target = mutate_markables_1(translation_source, translation_target, data_fix1)
+            # TODO: check that the mutations appear in source and target
+            if not translation_source:
+                continue
             if (
                 len(translation_target) > 1 and
                 len(translation_target)/len(translation_source) > 0.5 and
@@ -158,9 +165,6 @@ for (sent_cs, sent_en), align in zip(data_both, data_align):
                 translation_source not in markables_seen and
                 translation_target not in markables_seen
             ):
-                translation_source, translation_target = mutate_markables_1(translation_source, translation_target, data_fix1)
-                if not translation_source:
-                    continue
                 markables_seen.add(translation_source)
                 markables_seen.add(translation_target)
                 translation_dict_1.append({"en": translation_source, args.language: translation_target})
@@ -175,20 +179,18 @@ for (sent_cs, sent_en), align in zip(data_both, data_align):
     # randomized dictionary
     translation_dict_2 = []
     markables_seen = set()
-    markables_random_seen = set()
+
 
     possible_fixes = [(y,z) for x,y,z in data_fix2 if processed_sents+1 == x]
     if possible_fixes:
         # make sure the fixes appear there
         for markable_en, markable_cs in possible_fixes:
-            print(sent_en, markable_en, markable_en in " ".join(sent_en))
-            print(sent_cs, markable_cs, markable_cs in " ".join(sent_cs))
             assert markable_en in " ".join(sent_en) and markable_cs in " ".join(sent_cs)
             translation_dict_2.append({"en": markable_en, args.language: markable_cs})
     else:
-        # generate automaticall
+        # generate automatically
         for markable_len in true_markables_length:
-            attempts = 20
+            attempts = 100
             while True:
                 # reseed because we may be changing the history at places
                 random.seed(" ".join(sent_cs + sent_en))
@@ -200,20 +202,15 @@ for (sent_cs, sent_en), align in zip(data_both, data_align):
                 # disallow true markables
                 if markable.lower() in markables:
                     continue
+                # remove several banned words
                 if markable.lower() in {"the", "of"}:
                     continue
-                # disallow already added random markables
-                if markable in markables_random_seen:
-                    continue
-                markables_random_seen.add(markable)
                 translation_target, translation_source = align_markable(markable, sent_cs, sent_en)
                 # translation_source, translation_target = mutate_markables(translation_source, translation_target, data_fix1)
-                if not translation_source:
-                    continue
                 if (
                     len(translation_target) > 1 and
-                    len(translation_target)/len(translation_source) > 0.5 and
-                    len(translation_source)/len(translation_target) > 0.5 and
+                    len(translation_target)/len(translation_source) > 0.3 and
+                    len(translation_source)/len(translation_target) > 0.3 and
                     translation_source not in markables_seen and
                     translation_target not in markables_seen
                 ):
