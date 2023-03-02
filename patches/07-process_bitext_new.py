@@ -60,7 +60,7 @@ def align_markable(markable, sent_cs, sent_en):
     translation_source = sent_trunk[:len(markable)]
     return translation_target, translation_source
 
-def mutate_markables(translation_source, translation_target, data_fix):
+def mutate_markables_1(translation_source, translation_target, data_fix):
     possible_match = [x for x in data_fix if translation_target == x[0]]
     assert len(possible_match) <= 1
     if possible_match:
@@ -98,8 +98,10 @@ def mutate_markables(translation_source, translation_target, data_fix):
 data_both = [x.rstrip("\n").split(" ||| ") for x in open(f"data/align_small/{args.language}-en.both", "r").readlines()]
 data_align = [x.rstrip("\n") for x in open(f"data/align_small/{args.language}-en.algn", "r").readlines()]
 
-data_fix = [x.rstrip("\n").split(" |") for x in open(f"data/markables/{args.language}-en.fix", "r").readlines()]
-data_fix = [tuple([x[0]]+ x[1].split("| ")) for x in data_fix]
+data_fix1 = [x.rstrip("\n").split(" |") for x in open(f"data/markables/{args.language}-en.fix1", "r").readlines()]
+data_fix1 = [tuple([x[0]]+ x[1].split("| ")) for x in data_fix1]
+data_fix2 = [x[1:].rstrip("\n").split(" | ") for x in open(f"data/markables/{args.language}-en.fix2", "r").readlines()]
+data_fix2 = [(int(x[0]), *tuple(x[1].split(" + "))) for x in data_fix2]
 markables = set(open(f"data/markables/{args.language}-en.en", "r").read().rstrip().split("\n"))
 # make sure we process longer markables first to avoid prefix issue
 markables = sorted(list(markables), key=len, reverse=True)
@@ -111,6 +113,7 @@ fdict1 = open(f"data/clean/{args.language}-en.dict1.jsonl", "w")
 fdict2 = open(f"data/clean/{args.language}-en.dict2.jsonl", "w")
 
 seen_sents = set()
+processed_sents = 0
 
 for (sent_cs, sent_en), align in zip(data_both, data_align):
     if not sent_filter(sent_cs, sent_en):
@@ -155,7 +158,7 @@ for (sent_cs, sent_en), align in zip(data_both, data_align):
                 translation_source not in markables_seen and
                 translation_target not in markables_seen
             ):
-                translation_source, translation_target = mutate_markables(translation_source, translation_target, data_fix)
+                translation_source, translation_target = mutate_markables_1(translation_source, translation_target, data_fix1)
                 if not translation_source:
                     continue
                 markables_seen.add(translation_source)
@@ -173,37 +176,53 @@ for (sent_cs, sent_en), align in zip(data_both, data_align):
     translation_dict_2 = []
     markables_seen = set()
     markables_random_seen = set()
-    for markable_len in true_markables_length:
-        attempts = 20
-        while True:
-            markable_i = random.choice(range(len(sent_en)-markable_len+1))
-            markable = " ".join(sent_en[markable_i:markable_i+markable_len])
-            attempts -= 1
-            if attempts == 0:
-                break
-            # disallow true markables
-            if markable.lower() in markables:
-                continue
-            # disallow already added random markables
-            if markable in markables_random_seen:
-                continue
-            markables_random_seen.add(markable)
-            translation_target, translation_source = align_markable(markable, sent_cs, sent_en)
-            translation_source, translation_target = mutate_markables(translation_source, translation_target, data_fix)
-            if not translation_source:
-                continue
-            if (
-                len(translation_target) > 1 and
-                len(translation_target)/len(translation_source) > 0.5 and
-                len(translation_source)/len(translation_target) > 0.5 and
-                translation_source not in markables_seen and
-                translation_target not in markables_seen
-            ):
-                markables_seen.add(translation_source)
-                markables_seen.add(translation_target)
-                translation_dict_2.append({"en": translation_source, args.language: translation_target})
-                break
 
+    possible_fixes = [(y,z) for x,y,z in data_fix2 if processed_sents+1 == x]
+    if possible_fixes:
+        # make sure the fixes appear there
+        for markable_en, markable_cs in possible_fixes:
+            print(sent_en, markable_en, markable_en in " ".join(sent_en))
+            print(sent_cs, markable_cs, markable_cs in " ".join(sent_cs))
+            assert markable_en in " ".join(sent_en) and markable_cs in " ".join(sent_cs)
+            translation_dict_2.append({"en": markable_en, args.language: markable_cs})
+    else:
+        # generate automaticall
+        for markable_len in true_markables_length:
+            attempts = 20
+            while True:
+                # reseed because we may be changing the history at places
+                random.seed(" ".join(sent_cs + sent_en))
+                markable_i = random.choice(range(len(sent_en)-markable_len+1))
+                markable = " ".join(sent_en[markable_i:markable_i+markable_len])
+                attempts -= 1
+                if attempts == 0:
+                    break
+                # disallow true markables
+                if markable.lower() in markables:
+                    continue
+                if markable.lower() in {"the", "of"}:
+                    continue
+                # disallow already added random markables
+                if markable in markables_random_seen:
+                    continue
+                markables_random_seen.add(markable)
+                translation_target, translation_source = align_markable(markable, sent_cs, sent_en)
+                # translation_source, translation_target = mutate_markables(translation_source, translation_target, data_fix1)
+                if not translation_source:
+                    continue
+                if (
+                    len(translation_target) > 1 and
+                    len(translation_target)/len(translation_source) > 0.5 and
+                    len(translation_source)/len(translation_target) > 0.5 and
+                    translation_source not in markables_seen and
+                    translation_target not in markables_seen
+                ):
+                    markables_seen.add(translation_source)
+                    markables_seen.add(translation_target)
+                    translation_dict_2.append({"en": translation_source, args.language: translation_target})
+                    break
+
+    processed_sents += 1
     # add to output
     if len(translation_dict_2) > 0:
         fdict2.write(json.dumps(translation_dict_2, ensure_ascii=False) + "\n")
