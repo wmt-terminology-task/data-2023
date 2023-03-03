@@ -85,8 +85,6 @@ def mutate_markables_1(translation_source, translation_target, data_fix):
 
     possible_match = [x for x in data_fix if translation_source + " + " + translation_target == x[0]]
     assert len(possible_match) <= 1
-    if translation_source == "cas":
-        print(possible_match)
     if possible_match:
         possible_match = possible_match[0]
         if possible_match[1] == "DEL":
