@@ -29,7 +29,7 @@ for sent_i, (sent_cs, sent_en, sent_d1, sent_d2) in enumerate(zip(data_cs, data_
     if not sent_d1 or not sent_d2:
         continue
 
-    if (((args.lang == "cs" and sent_i >= 662) or (args.lang == "de" and sent_i >= 621))
+    if (((args.lang == "cs" and sent_i >= 473) or (args.lang == "de" and sent_i >= 356))
         and not flipped
     ):
         flipped = True
