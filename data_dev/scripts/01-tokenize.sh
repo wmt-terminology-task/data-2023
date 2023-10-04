@@ -1,9 +1,11 @@
 #!/usr/bin/bash
 
-# for LANG in "cs" "de" "en"; do
-# for file in data/raw/*.$LANG; do
-for LANG in "de" "en"; do
-for file in data/raw/*.de-en.$LANG; do
+# 
+# Tokenize raw dev files.
+# 
+
+for LANG in "cs" "de" "en"; do
+for file in data_dev/raw/*.$LANG; do
     echo $file
     fout="${file/\/raw\//\/tok\/}"
     sacremoses -l $LANG -j 20 tokenize < $file > $fout

@@ -95,22 +95,22 @@ def mutate_markables_1(translation_source, translation_target, data_fix):
     # fallback with noop
     return translation_source, translation_target
 
-data_both = [x.rstrip("\n").split(" ||| ") for x in open(f"data/align_small/{args.language}-en.both", "r").readlines()]
-data_align = [x.rstrip("\n") for x in open(f"data/align_small/{args.language}-en.algn", "r").readlines()]
+data_both = [x.rstrip("\n").split(" ||| ") for x in open(f"data_dev/align_small/{args.language}-en.both", "r").readlines()]
+data_align = [x.rstrip("\n") for x in open(f"data_dev/align_small/{args.language}-en.algn", "r").readlines()]
 
-data_fix1 = [x.rstrip("\n").split(" |") for x in open(f"data/markables/{args.language}-en.fix1", "r").readlines()]
+data_fix1 = [x.rstrip("\n").split(" |") for x in open(f"data_dev/markables/{args.language}-en.fix1", "r").readlines()]
 data_fix1 = [tuple([x[0]]+ x[1].split("| ")) for x in data_fix1]
-data_fix2 = [x[1:].rstrip("\n").split(" | ") for x in open(f"data/markables/{args.language}-en.fix2", "r").readlines()]
+data_fix2 = [x[1:].rstrip("\n").split(" | ") for x in open(f"data_dev/markables/{args.language}-en.fix2", "r").readlines()]
 data_fix2 = [(int(x[0]), *tuple(x[1].split(" + "))) for x in data_fix2]
-markables = set(open(f"data/markables/{args.language}-en.en", "r").read().rstrip().split("\n"))
+markables = set(open(f"data_dev/markables/{args.language}-en.en", "r").read().rstrip().split("\n"))
 # make sure we process longer markables first to avoid substring issue
 markables = sorted(list(markables), key=len, reverse=True)
 markables = {x.lower() for x in markables if x}
 
-fen = open(f"data/clean/{args.language}-en.en", "w")
-fde = open(f"data/clean/{args.language}-en.{args.language}", "w")
-fdict1 = open(f"data/clean/{args.language}-en.dict1.jsonl", "w")
-fdict2 = open(f"data/clean/{args.language}-en.dict2.jsonl", "w")
+fen = open(f"data_dev/clean/{args.language}-en.en", "w")
+fde = open(f"data_dev/clean/{args.language}-en.{args.language}", "w")
+fdict1 = open(f"data_dev/clean/{args.language}-en.dict1.jsonl", "w")
+fdict2 = open(f"data_dev/clean/{args.language}-en.dict2.jsonl", "w")
 
 seen_sents = set()
 processed_sents = 0

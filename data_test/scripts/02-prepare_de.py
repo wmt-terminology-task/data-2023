@@ -11,9 +11,9 @@ import chardet
 sentence_splitter_en = MosesSentenceSplitter(lang="en")
 sentence_splitter_de = MosesSentenceSplitter(lang="de")
 
-fout = open("data/muchmore_corpus.jsonl", "w")
+fout = open("data_dev/muchmore_corpus.jsonl", "w")
 
-for fde in glob.glob("data/springer_german_train_plain/*.abstr"):
+for fde in glob.glob("data_dev/springer_german_train_plain/*.abstr"):
     fen = fde.replace(".ger.", ".eng.").replace("_german_", "_english_")
     if not os.path.exists(fen):
         continue

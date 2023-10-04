@@ -3,11 +3,11 @@
 import nltk
 import nltk.tokenize
 
-data_0 = [x.rstrip("\n") for x in open("data/raw/elitr.cs-en.cs", "r").readlines()]
-data_1 = [x.rstrip("\n") for x in open("data/raw/elitr.cs-en.en", "r").readlines()]
+data_0 = [x.rstrip("\n") for x in open("data_dev/raw/elitr.cs-en.cs", "r").readlines()]
+data_1 = [x.rstrip("\n") for x in open("data_dev/raw/elitr.cs-en.en", "r").readlines()]
 
-fout_0 = open("data/raw/elitr.exp.cs-en.cs", "w")
-fout_1 = open("data/raw/elitr.exp.cs-en.en", "w")
+fout_0 = open("data_dev/raw/elitr.exp.cs-en.cs", "w")
+fout_1 = open("data_dev/raw/elitr.exp.cs-en.en", "w")
 
 for sent_0, sent_1 in zip(data_0, data_1):
     sents_0 = nltk.tokenize.sent_tokenize(sent_0, language="czech")
@@ -24,11 +24,11 @@ for sent_0, sent_1 in zip(data_0, data_1):
 
 
 
-data_0 = [x.rstrip("\n") for x in open("data/raw/report.de-en.de", "r").readlines()]
-data_1 = [x.rstrip("\n") for x in open("data/raw/report.de-en.en", "r").readlines()]
+data_0 = [x.rstrip("\n") for x in open("data_dev/raw/report.de-en.de", "r").readlines()]
+data_1 = [x.rstrip("\n") for x in open("data_dev/raw/report.de-en.en", "r").readlines()]
 
-fout_0 = open("data/raw/report.exp.de-en.de", "w")
-fout_1 = open("data/raw/report.exp.de-en.en", "w")
+fout_0 = open("data_dev/raw/report.exp.de-en.de", "w")
+fout_1 = open("data_dev/raw/report.exp.de-en.en", "w")
 
 for sent_0, sent_1 in zip(data_0, data_1):
     sents_0 = nltk.tokenize.sent_tokenize(sent_0, language="german")

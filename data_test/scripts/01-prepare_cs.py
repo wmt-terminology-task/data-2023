@@ -3,9 +3,9 @@
 import json
 from nltk.tokenize import sent_tokenize
 
-data = [json.loads(x) for x in open("data/ufal_corpus.jsonl", "r")]
+data = [json.loads(x) for x in open("data_dev/ufal_corpus.jsonl", "r")]
 
-fout = open("data/ufal_corpus_processed.jsonl", "w")
+fout = open("data_dev/ufal_corpus_processed.jsonl", "w")
 
 for line in data:
     if line["lang"] != "en":
