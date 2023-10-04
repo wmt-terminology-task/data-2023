@@ -3,7 +3,7 @@
 Download the 2023 terminology testsuite as:
 
 ```
-curl -Lo- https://raw.githubusercontent.com/wmt-terminology-task/data-2023/main/data_test/scripts/03-fetch.sh | bash
+curl -Lo- "https://raw.githubusercontent.com/wmt-terminology-task/data-2023/main/data_test/scripts/03-fetch.sh" | bash
 ```
 
 This will create the following structure:
@@ -24,10 +24,17 @@ wmt2023terminology/
     deen.terminology.random
 ```
 
-All files except for `all.jsonl` are raw files
+All files except for `all.jsonl` are raw files.
+The `all.jsonl` contains the whole dataset for all languages (keys `langs`, `src`, `tgt`, `terminology-proper`, `terminology-random`) and can be loaded from Python:
+```python
+import json
+data = [json.loads(x) for x in open("wmt2023terminology/all.jsonl")]
+```
 
-Cite as:
+If you use this data, please cite:
 
 ```
 TODO
 ```
+
+This project is a collaboration between ETH Zurich, AIWaves, Microsoft and Charles Univeristy.

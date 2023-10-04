@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 
-import nltk
-import nltk.tokenize
 import argparse
 
 args = argparse.ArgumentParser()

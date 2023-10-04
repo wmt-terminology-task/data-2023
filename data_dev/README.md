@@ -1,4 +1,6 @@
-Semi-automatic markable annotation
+This data was distributed to the participants to provide some weak optimization signal.
+If you want to user terminology data, please use the one from `data_test/`.
+The dev data was created using a semi-automatic markable annotation with subpar quality.
 
 Alignment train files:
 - https://object.pouta.csc.fi/OPUS-CCAligned/v1/moses/cs-en.txt.zip
