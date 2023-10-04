@@ -1,0 +1,6 @@
+data_test/raw
+data_test/raw2
+data_dev/raw
+data_dev/raw2
+__pycache__
+.vscode
