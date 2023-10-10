@@ -4,3 +4,6 @@ data_dev/raw
 data_dev/raw2
 __pycache__
 .vscode
+data_test/deen.*
+data_test/encs.*
+data_test/zhen.*
