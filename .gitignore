@@ -2,6 +2,8 @@ data_test/raw
 data_test/raw2
 data_dev/raw
 data_dev/raw2
+data_dev/raw3
+data_dev/raw4
 __pycache__
 .vscode
 data_test/deen.*

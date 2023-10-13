@@ -1,6 +1,6 @@
 # WMT 2023 Terminology Shared Task Data
 
-Run the following to unpack the dev and test data:
+Run the following to unpack the dev and test data (names differ from original task split):
 ```bash
 git clone https://github.com/wmt-terminology-task/data-2023.git wmt-terminology-2023-data
 cd wmt-terminology-2023-data
