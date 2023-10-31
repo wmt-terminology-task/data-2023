@@ -42,15 +42,14 @@ The scripts in this repository are purely for reproduction purposes and in norma
 If you use this data, please cite:
 
 ```
-@inproceedings{Yuchen-etal-2023-findings,
+@inproceedings{Semenov-etal-2023-findings,
     title = "Findings of the WMT 2023 Shared Task on Machine Translation with Terminologies",
-    author = "Yuchen Eleanor Jiang and
-              Wangchunshu Zhou and
+    author = "Kirill Semenov and
               Vilém Zouhar and
               Tom Kocmi and
-              Kirill Semenov and
               Dongdong Zhang and
-              Ryan Cotterell",
+              Wangchunshu Zhou and
+              Yuchen Eleanor Jiang"
     booktitle = "Proceedings of the Eight Conference on Machine Translation (WMT)",
     month = dec,
     year = "2023",
