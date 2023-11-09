@@ -42,7 +42,7 @@ The scripts in this repository are purely for reproduction purposes and in norma
 If you use this data, please cite:
 
 ```
-@inproceedings{Semenov-etal-2023-findings,
+@inproceedings{semenov-etal-2023-findings,
     title = "Findings of the WMT 2023 Shared Task on Machine Translation with Terminologies",
     author = "Kirill Semenov and
               Vilém Zouhar and
