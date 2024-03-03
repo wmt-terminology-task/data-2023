@@ -5,8 +5,35 @@ It is easily accessible [from huggingface](https://huggingface.co/datasets/zouha
 
 ```python3
 from datasets import load_dataset
-data = load_dataset("zouharvi/wmt-terminology-2023")["test]
+data = load_dataset("zouharvi/wmt-terminology-2023")["test"]
+print(len(data))
 ```
+
+If you use this data, please [read the paper](https://aclanthology.org/2023.wmt-1.54/) and cite:
+
+```
+@inproceedings{semenov-etal-2023-findings,
+    title = "Findings of the WMT 2023 Shared Task on Machine Translation with Terminologies",
+    author = "Kirill Semenov and
+              Vilém Zouhar and
+              Tom Kocmi and
+              Dongdong Zhang and
+              Wangchunshu Zhou and
+              Yuchen Eleanor Jiang"
+    booktitle = "Proceedings of the Eight Conference on Machine Translation (WMT)",
+    month = dec,
+    year = "2023",
+    publisher = "Association for Computational Linguistics",
+}
+```
+
+The three language pairs for the test dataset are sourced from:
+- [Czech and English abstracts of ÚFAL papers](https://lindat.mff.cuni.cz/repository/xmlui/handle/11234/1-4922) by Rudolf Rosa and Vilém Zouhar
+- [MuchMore Springer Bilingual Corpus](https://muchmore.dfki.de/resources1.htm)
+- [BWB Corpus](https://aclanthology.org/2023.acl-long.435/) by Yuchen Eleanor Jiang et al.
+
+This project is a collaboration between ETH Zurich, AIWaves, Microsoft and Charles Univeristy.
+
 
 ## Previous version
 
@@ -51,27 +78,4 @@ awk "FNR==33{print;nextfile}" data_test/deen.{en,de,term.proper,term.random}
 ```
 
 The scripts in this repository are purely for reproduction purposes and in normal situations should not be used.
-If you use this data, please cite:
 
-```
-@inproceedings{semenov-etal-2023-findings,
-    title = "Findings of the WMT 2023 Shared Task on Machine Translation with Terminologies",
-    author = "Kirill Semenov and
-              Vilém Zouhar and
-              Tom Kocmi and
-              Dongdong Zhang and
-              Wangchunshu Zhou and
-              Yuchen Eleanor Jiang"
-    booktitle = "Proceedings of the Eight Conference on Machine Translation (WMT)",
-    month = dec,
-    year = "2023",
-    publisher = "Association for Computational Linguistics",
-}
-```
-
-The three language pairs for the test dataset are sourced from:
-- [Czech and English abstracts of ÚFAL papers](https://lindat.mff.cuni.cz/repository/xmlui/handle/11234/1-4922) by Rudolf Rosa and Vilém Zouhar
-- [MuchMore Springer Bilingual Corpus](https://muchmore.dfki.de/resources1.htm)
-- [BWB Corpus](https://aclanthology.org/2023.acl-long.435/) by Yuchen Eleanor Jiang et al.
-
-This project is a collaboration between ETH Zurich, AIWaves, Microsoft and Charles Univeristy.
