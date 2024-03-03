@@ -1,5 +1,17 @@
 # WMT 2023 Terminology Shared Task Data
 
+The current version contains both the sources, references, terminologies but also participant submissions.
+It is easily accessible [from huggingface](https://huggingface.co/datasets/zouharvi/wmt-terminology-2023) and contains only the `test` split:
+
+```python3
+from datasets import load_dataset
+data = load_dataset("zouharvi/wmt-terminology-2023")["test]
+```
+
+## Previous version
+
+Note: this method is deprecated.
+
 Run the following to unpack the dev and test data (names differ from original task split):
 ```bash
 git clone https://github.com/wmt-terminology-task/data-2023.git wmt-terminology-2023-data
